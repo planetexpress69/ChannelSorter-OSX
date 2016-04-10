@@ -18,7 +18,7 @@ import AEXML
 	Option = 211
  */
 
-class ViewController: NSViewController {
+class ViewController: NSViewController, NSWindowDelegate {
 
     @IBOutlet weak var theButton: NSButton!
     @IBOutlet weak var theTable: NSTableView! {
@@ -37,6 +37,12 @@ class ViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         theTable.registerForDraggedTypes([MyRowType, NSFilenamesPboardType])
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    override func viewDidAppear() {
+        super.viewDidAppear()
+        self.view.window?.delegate = self
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -168,6 +174,11 @@ class ViewController: NSViewController {
             elem.addChild(AEXMLElement("isUserSelCHNo", value: "1"))
             theTable.reloadData()
         }
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    func windowShouldClose(sender: AnyObject) -> Bool {
+        return false
     }
 
 }

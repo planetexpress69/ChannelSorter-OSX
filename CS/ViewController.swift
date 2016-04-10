@@ -20,7 +20,12 @@ import AEXML
 
 class ViewController: NSViewController {
 
-    @IBOutlet weak var theButton: NSButton! { didSet { } }
+    @IBOutlet weak var theButton: NSButton! {
+        didSet {
+            //theButton.target = self;
+            //theButton.action = #selector(ViewController.openFile(_:))
+        }
+    }
     @IBOutlet weak var theTable: NSTableView! {
         didSet {
             theTable?.setDataSource(self)
@@ -33,53 +38,57 @@ class ViewController: NSViewController {
 
     let MyRowType = "MyRowType"
 
+    // ---------------------------------------------------------------------------------------------
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        load()
+        //load()
         theTable.registerForDraggedTypes([MyRowType, NSFilenamesPboardType])
-
-
     }
 
-    // ------------------------------------------------------------------------------
-    func load() {
+    // ---------------------------------------------------------------------------------------------
+    func load(url: NSURL) {
+        let priority = DISPATCH_QUEUE_PRIORITY_DEFAULT
+        dispatch_async(dispatch_get_global_queue(priority, 0)) {
+            // do some task
 
-        guard let
-            xmlPath = NSBundle.mainBundle().pathForResource("GlobalClone00001", ofType: "TLL"),
-            data = NSData(contentsOfFile: xmlPath)
-            else { return }
 
-        do {
-            xmlDoc = try AEXMLDocument(xmlData: data)
+            guard let
+                //xmlPath = NSBundle.mainBundle().pathForResource("GlobalClone00001", ofType: "TLL"),
+                data = NSData(contentsOfURL: url)
+                else { return }
 
-            // i know that my channels are on DTV (digital tv)
-            for item in xmlDoc.root["CHANNEL"]["DTV"].children {
-                if item["serviceType"].stringValue != "2" {
-                    haystack.append(item)
-                    item.removeFromParent()
+            do {
+                self.xmlDoc = try AEXMLDocument(xmlData: data)
+                // i know that my channels are on DTV (digital tv)
+                for item in self.xmlDoc.root["CHANNEL"]["DTV"].children {
+                    if item["serviceType"].stringValue != "2" {
+                        self.haystack.append(item)
+                        item.removeFromParent()
+                    }
                 }
+                dispatch_async(dispatch_get_main_queue()) {
+                    print("Length: \(self.haystack.count)")
+                    self.theTable.reloadData()
+                }
+
+
+            }
+            catch {
+                print("\(error)")
             }
 
-            print("Length: \(haystack.count)")
-
-            // remove the old DTV node
-            //xmlDoc.root["CHANNEL"]["DTV"].removeFromParent()
-        }
-        catch {
-            print("\(error)")
         }
     }
 
-
+    // ---------------------------------------------------------------------------------------------
     override var representedObject: AnyObject? {
         didSet {
-        // Update the view, if already loaded.
+            // Update the view, if already loaded.
         }
     }
 
-    // ------------------------------------------------------------------------------
-    func hexStringtoAscii(hexString : String) -> String {
+    // ---------------------------------------------------------------------------------------------
+    func _hexStringtoAscii(hexString : String) -> String {
         let pattern = "(0x)?([0-9a-f]{2})"
         let regex = try! NSRegularExpression(pattern: pattern, options: .CaseInsensitive)
         let nsString = hexString as NSString
@@ -90,17 +99,47 @@ class ViewController: NSViewController {
         return String(characters)
     }
 
+    // ---------------------------------------------------------------------------------------------
+    func _moveItem(item: AEXMLElement, from: Int, to: Int) {
+        haystack.removeAtIndex(from)
 
+        if(to > haystack.endIndex) {
+            haystack.append(item)
+        }
+        else {
+            haystack.insert(item, atIndex: to)
+        }
+        theTable.reloadData()
+    }
 
+    @IBAction func openXmlFile(sender: AnyObject) {
 
+        let openPanel = NSOpenPanel();
+        openPanel.allowsMultipleSelection = false;
+        openPanel.canChooseDirectories = false;
+        openPanel.canCreateDirectories = false;
+        openPanel.canChooseFiles = true;
+        let i = openPanel.runModal();
+        if i == NSModalResponseOK {
+            print(openPanel.URL);
+            load(openPanel.URL!)
+            //print(lettersPic);
+        }
+    }
 
 }
 
+// -------------------------------------------------------------------------------------------------
+// NSTAbleViewDatasource protocol methods
+// -------------------------------------------------------------------------------------------------
 extension ViewController : NSTableViewDataSource {
+
+    // ---------------------------------------------------------------------------------------------
     func numberOfRowsInTableView(tableView: NSTableView) -> Int {
         return haystack.count ?? 0
     }
 
+    // ---------------------------------------------------------------------------------------------
     func tableView(tableView: NSTableView, acceptDrop info: NSDraggingInfo, row: Int, dropOperation: NSTableViewDropOperation) -> Bool {
         let pasteboard = info.draggingPasteboard()
         let rowData = pasteboard.dataForType(MyRowType)
@@ -121,68 +160,51 @@ extension ViewController : NSTableViewDataSource {
         }
     }
 
+    // ---------------------------------------------------------------------------------------------
     func tableView(tableView: NSTableView, validateDrop info: NSDraggingInfo, proposedRow row: Int, proposedDropOperation dropOperation: NSTableViewDropOperation) -> NSDragOperation {
         theTable.setDropRow(row, dropOperation: NSTableViewDropOperation.Above)
         return NSDragOperation.Move
     }
 
+    // ---------------------------------------------------------------------------------------------
     func tableView(tableView: NSTableView, writeRowsWithIndexes rowIndexes: NSIndexSet, toPasteboard pboard: NSPasteboard) -> Bool {
         let data = NSKeyedArchiver.archivedDataWithRootObject([rowIndexes])
         pboard.declareTypes([MyRowType], owner:self)
         pboard.setData(data, forType:MyRowType)
-
         return true
     }
 
-    func _moveItem(item: AEXMLElement, from: Int, to: Int) {
-        haystack.removeAtIndex(from)
-
-        if(to > haystack.endIndex) {
-            haystack.append(item)
-        }
-        else {
-            haystack.insert(item, atIndex: to)
-        }
-        theTable.reloadData()
-    }
-
-
-
 }
 
+// -------------------------------------------------------------------------------------------------
+// NSTAbleViewDelegate protocol methods
+// -------------------------------------------------------------------------------------------------
 extension ViewController : NSTableViewDelegate {
     func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
 
         var text:String = ""
         var cellIdentifier: String = ""
 
-        // 1
-
-
         guard let item:AEXMLElement = haystack[row] else {
             return nil
         }
 
-        print(item)
-
-        // 2
         if tableColumn == tableView.tableColumns[0] {
-
             text = item["prNum"].stringValue
             cellIdentifier = "PosCellID"
         } else if tableColumn == tableView.tableColumns[1] {
-            text = hexStringtoAscii(item["hexVchName"].stringValue)
+            text = _hexStringtoAscii(item["hexVchName"].stringValue)
             cellIdentifier = "NameCellID"
         }
-
-        // 3
+        
         if let cell = tableView.makeViewWithIdentifier(cellIdentifier, owner: nil) as? NSTableCellView {
             cell.textField?.stringValue = text
             return cell
         }
+        
         return nil
     }
-
+    
 }
 
 

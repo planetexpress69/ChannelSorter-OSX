@@ -20,12 +20,7 @@ import AEXML
 
 class ViewController: NSViewController {
 
-    @IBOutlet weak var theButton: NSButton! {
-        didSet {
-            //theButton.target = self;
-            //theButton.action = #selector(ViewController.openFile(_:))
-        }
-    }
+    @IBOutlet weak var theButton: NSButton!
     @IBOutlet weak var theTable: NSTableView! {
         didSet {
             theTable?.setDataSource(self)
@@ -41,19 +36,40 @@ class ViewController: NSViewController {
     // ---------------------------------------------------------------------------------------------
     override func viewDidLoad() {
         super.viewDidLoad()
-        //load()
         theTable.registerForDraggedTypes([MyRowType, NSFilenamesPboardType])
     }
 
     // ---------------------------------------------------------------------------------------------
-    func load(url: NSURL) {
+    func _saveXml(url: NSURL) {
         let priority = DISPATCH_QUEUE_PRIORITY_DEFAULT
         dispatch_async(dispatch_get_global_queue(priority, 0)) {
-            // do some task
 
+            for (index, _) in self.haystack.enumerate() {
+                self.xmlDoc.root["CHANNEL"]["DTV"].addChild(self.haystack[index])
+            }
+
+            do {
+                try self.xmlDoc.xmlString.writeToURL(url as NSURL,
+                                                     atomically: true,
+                                                     encoding: NSUTF8StringEncoding)
+            } catch {
+                // add some error handling here
+            }
+            dispatch_async(dispatch_get_main_queue()) {
+
+            }
+
+        }
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    func _load(url: NSURL) {
+        let priority = DISPATCH_QUEUE_PRIORITY_DEFAULT
+        dispatch_async(dispatch_get_global_queue(priority, 0)) {
+
+            self.haystack.removeAll()
 
             guard let
-                //xmlPath = NSBundle.mainBundle().pathForResource("GlobalClone00001", ofType: "TLL"),
                 data = NSData(contentsOfURL: url)
                 else { return }
 
@@ -70,8 +86,6 @@ class ViewController: NSViewController {
                     print("Length: \(self.haystack.count)")
                     self.theTable.reloadData()
                 }
-
-
             }
             catch {
                 print("\(error)")
@@ -92,9 +106,13 @@ class ViewController: NSViewController {
         let pattern = "(0x)?([0-9a-f]{2})"
         let regex = try! NSRegularExpression(pattern: pattern, options: .CaseInsensitive)
         let nsString = hexString as NSString
-        let matches = regex.matchesInString(hexString, options: [], range: NSMakeRange(0, nsString.length))
+        let matches = regex.matchesInString(hexString, options: [],
+                                            range: NSMakeRange(0,
+                                                nsString.length))
         let characters = matches.map {
-            Character(UnicodeScalar(UInt32(nsString.substringWithRange($0.rangeAtIndex(2)), radix: 16)!))
+            Character(UnicodeScalar(
+                UInt32(nsString.substringWithRange($0.rangeAtIndex(2)), radix: 16)!)
+            )
         }
         return String(characters)
     }
@@ -102,7 +120,6 @@ class ViewController: NSViewController {
     // ---------------------------------------------------------------------------------------------
     func _moveItem(item: AEXMLElement, from: Int, to: Int) {
         haystack.removeAtIndex(from)
-
         if(to > haystack.endIndex) {
             haystack.append(item)
         }
@@ -112,18 +129,44 @@ class ViewController: NSViewController {
         theTable.reloadData()
     }
 
+    // ---------------------------------------------------------------------------------------------
     @IBAction func openXmlFile(sender: AnyObject) {
+        let openPanel = NSOpenPanel()
+        openPanel.allowsMultipleSelection = false
+        openPanel.canChooseDirectories = false
+        openPanel.canCreateDirectories = false
+        openPanel.canChooseFiles = true
+        openPanel.allowedFileTypes = ["TLL"]
+        openPanel.beginWithCompletionHandler { (result) -> Void in
+            if result == NSFileHandlingPanelOKButton {
+                self._load(openPanel.URL!)
+            }
+        }
+    }
 
-        let openPanel = NSOpenPanel();
-        openPanel.allowsMultipleSelection = false;
-        openPanel.canChooseDirectories = false;
-        openPanel.canCreateDirectories = false;
-        openPanel.canChooseFiles = true;
-        let i = openPanel.runModal();
-        if i == NSModalResponseOK {
-            print(openPanel.URL);
-            load(openPanel.URL!)
-            //print(lettersPic);
+    // ---------------------------------------------------------------------------------------------
+    @IBAction func saveXmlFile(sender: AnyObject) {
+        let savePanel = NSSavePanel()
+        savePanel.beginWithCompletionHandler { (result) in
+            if result == NSFileHandlingPanelOKButton {
+                let exportedFileURL = savePanel.URL
+                self._saveXml(exportedFileURL!)
+            }
+        }
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    @IBAction func newOrder(sender: AnyObject) {
+        for (index, _) in haystack.enumerate() {
+            // get elem
+            let elem = haystack[index]
+            // remove old attrs
+            elem["prNum"].removeFromParent()
+            elem["isUserSelCHNo"].removeFromParent()
+            // make new attrs
+            elem.addChild(AEXMLElement("prNum", value: "\(index + 1)"))
+            elem.addChild(AEXMLElement("isUserSelCHNo", value: "1"))
+            theTable.reloadData()
         }
     }
 
@@ -201,7 +244,7 @@ extension ViewController : NSTableViewDelegate {
             cell.textField?.stringValue = text
             return cell
         }
-        
+
         return nil
     }
     

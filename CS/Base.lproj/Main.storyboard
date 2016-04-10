@@ -90,7 +90,7 @@
                                         </menuItem>
                                         <menuItem title="Save…" keyEquivalent="s" id="pxx-59-PXV">
                                             <connections>
-                                                <action selector="saveDocument:" target="Ady-hI-5gd" id="teZ-XB-qJY"/>
+                                                <action selector="saveXmlFile:" target="Ady-hI-5gd" id="ENz-nq-sDF"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Save As…" keyEquivalent="S" id="Bw7-FT-i3A">
@@ -674,9 +674,9 @@
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Wom-CI-EvM">
-                                <rect key="frame" x="0.0" y="0.0" width="480" height="213"/>
+                                <rect key="frame" x="0.0" y="0.0" width="480" height="209"/>
                                 <clipView key="contentView" id="1Zw-4g-Qn7">
-                                    <rect key="frame" x="1" y="0.0" width="478" height="212"/>
+                                    <rect key="frame" x="1" y="0.0" width="478" height="208"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" headerView="Z3e-HX-5vC" viewBased="YES" floatsGroupRows="NO" id="ket-vZ-v0J">
@@ -769,7 +769,7 @@
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </clipView>
                                 <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="VOW-6w-Twx">
-                                    <rect key="frame" x="1" y="196" width="478" height="16"/>
+                                    <rect key="frame" x="1" y="192" width="478" height="16"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="Kl4-1h-I9P">
@@ -781,30 +781,27 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableHeaderView>
                             </scrollView>
-                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="WFd-uE-IDr">
-                                <rect key="frame" x="385" y="222" width="81" height="32"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="69" id="2lU-7O-03i"/>
-                                    <constraint firstAttribute="height" constant="21" id="ivQ-f9-pnl"/>
-                                </constraints>
-                                <buttonCell key="cell" type="push" title="Button" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7VN-Oo-P5Z">
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="P8a-1e-SJX">
+                                <rect key="frame" x="400" y="222" width="66" height="32"/>
+                                <buttonCell key="cell" type="push" title="Sort" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1fp-jw-1zF">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
+                                    <connections>
+                                        <action selector="newOrder:" target="rPt-NT-nkU" id="7OQ-n0-y3q"/>
+                                    </connections>
                                 </buttonCell>
                             </button>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="WFd-uE-IDr" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="20" id="3k9-Ec-tkh"/>
-                            <constraint firstItem="Wom-CI-EvM" firstAttribute="top" secondItem="WFd-uE-IDr" secondAttribute="bottom" constant="16" id="VHe-d0-4Ac"/>
-                            <constraint firstAttribute="trailing" secondItem="WFd-uE-IDr" secondAttribute="trailing" constant="20" id="aai-TO-rB5"/>
-                            <constraint firstAttribute="bottom" secondItem="Wom-CI-EvM" secondAttribute="bottom" id="app-Ln-b7m"/>
-                            <constraint firstAttribute="trailing" secondItem="Wom-CI-EvM" secondAttribute="trailing" id="da0-xt-1c5"/>
-                            <constraint firstItem="Wom-CI-EvM" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="ouz-GW-3md"/>
-                            <constraint firstItem="Wom-CI-EvM" firstAttribute="top" secondItem="WFd-uE-IDr" secondAttribute="bottom" constant="16" id="x6v-95-E1m"/>
+                            <constraint firstItem="Wom-CI-EvM" firstAttribute="top" secondItem="P8a-1e-SJX" secondAttribute="bottom" constant="20" symbolic="YES" id="DDY-iL-TgY"/>
+                            <constraint firstAttribute="trailing" secondItem="P8a-1e-SJX" secondAttribute="trailing" constant="20" symbolic="YES" id="PGk-JS-cPv"/>
+                            <constraint firstItem="Wom-CI-EvM" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="61" id="QOh-Wb-RPq"/>
+                            <constraint firstAttribute="trailing" secondItem="Wom-CI-EvM" secondAttribute="trailing" id="U78-OT-9X8"/>
+                            <constraint firstItem="Wom-CI-EvM" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="ne8-AW-CkV"/>
+                            <constraint firstAttribute="bottom" secondItem="Wom-CI-EvM" secondAttribute="bottom" id="r2U-wF-a9q"/>
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="theButton" destination="WFd-uE-IDr" id="n5S-m7-1zF"/>
                         <outlet property="theTable" destination="ket-vZ-v0J" id="gTg-so-dAK"/>
                     </connections>
                 </viewController>

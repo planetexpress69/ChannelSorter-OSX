@@ -165,6 +165,9 @@ class ViewController: NSViewController, NSWindowDelegate {
         // 4. set selected to moved one
         let index = NSIndexSet(index: to)
         theTable.selectRowIndexes(index, byExtendingSelection: false)
+
+        // prevent from scrolling out of view
+        theTable.scrollRowToVisible(to)
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -312,6 +315,7 @@ extension ViewController : NSTableViewDelegate {
         return nil
     }
 
+    // ---------------------------------------------------------------------------------------------
     func tableViewSelectionDidChange(notification: NSNotification) {
         let row = theTable.selectedRow
         if row == -1 {

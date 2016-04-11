@@ -43,6 +43,7 @@ class ViewController: NSViewController, NSWindowDelegate {
     override func viewDidAppear() {
         super.viewDidAppear()
         self.view.window?.delegate = self
+        self.view.window?.title = "ChannelSorter"
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -64,7 +65,6 @@ class ViewController: NSViewController, NSWindowDelegate {
             dispatch_async(dispatch_get_main_queue()) {
 
             }
-
         }
     }
 
@@ -83,10 +83,10 @@ class ViewController: NSViewController, NSWindowDelegate {
                 self.xmlDoc = try AEXMLDocument(xmlData: data)
                 // i know that my channels are on DTV (digital tv)
                 for item in self.xmlDoc.root["CHANNEL"]["DTV"].children {
-                    if item["serviceType"].stringValue != "2" {
+                    //if item["serviceType"].stringValue != "2" {
                         self.haystack.append(item)
                         item.removeFromParent()
-                    }
+                    //}
                 }
                 dispatch_async(dispatch_get_main_queue()) {
                     print("Length: \(self.haystack.count)")
@@ -126,12 +126,14 @@ class ViewController: NSViewController, NSWindowDelegate {
     // ---------------------------------------------------------------------------------------------
     func _moveItem(item: AEXMLElement, from: Int, to: Int) {
         haystack.removeAtIndex(from)
-        if(to > haystack.endIndex) {
+        if to > haystack.endIndex {
             haystack.append(item)
         }
         else {
             haystack.insert(item, atIndex: to)
         }
+
+        newOrder(nil)
         theTable.reloadData()
     }
 
@@ -162,7 +164,7 @@ class ViewController: NSViewController, NSWindowDelegate {
     }
 
     // ---------------------------------------------------------------------------------------------
-    @IBAction func newOrder(sender: AnyObject) {
+    @IBAction func newOrder(sender: AnyObject?) {
         for (index, _) in haystack.enumerate() {
             // get elem
             let elem = haystack[index]
@@ -181,6 +183,26 @@ class ViewController: NSViewController, NSWindowDelegate {
         return false
     }
 
+    func _humanReadableServiceType(serviceNum: String) -> String {
+        switch serviceNum {
+        case "1":
+            return "SDTV"
+        case "2":
+            return "Radio"
+        case "12":
+            return "Data"
+        case "22":
+            return "SDTV MPEG4"
+        case "25":
+            return "HDTV"
+        case "211":
+            return "Option"
+        default:
+            return "unknown"
+        }
+    }
+
+    
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -206,6 +228,7 @@ extension ViewController : NSTableViewDataSource {
             let item = haystack[movingFromIndex]
 
             _moveItem(item, from: movingFromIndex, to: row)
+
 
             return true
         }
@@ -249,6 +272,9 @@ extension ViewController : NSTableViewDelegate {
         } else if tableColumn == tableView.tableColumns[1] {
             text = _hexStringtoAscii(item["hexVchName"].stringValue)
             cellIdentifier = "NameCellID"
+        } else if tableColumn == tableView.tableColumns[2] {
+            text = _humanReadableServiceType(item["serviceType"].stringValue)
+            cellIdentifier = "ServiceTypeCellID"
         }
         
         if let cell = tableView.makeViewWithIdentifier(cellIdentifier, owner: nil) as? NSTableCellView {

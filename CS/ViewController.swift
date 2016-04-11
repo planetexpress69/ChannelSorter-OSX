@@ -146,6 +146,8 @@ class ViewController: NSViewController, NSWindowDelegate {
     // MARK: - Model move
     // ---------------------------------------------------------------------------------------------
     func _moveItem(item: AEXMLElement, from: Int, to: Int) {
+
+        // 1. remove & re-insert or append
         haystack.removeAtIndex(from)
         if to > haystack.endIndex {
             haystack.append(item)
@@ -153,8 +155,16 @@ class ViewController: NSViewController, NSWindowDelegate {
         else {
             haystack.insert(item, atIndex: to)
         }
-        newOrder() // re-neumbering
+
+        // 2. re-neumbering
+        newOrder()
+
+        // 3. visual update
         theTable.reloadData()
+
+        // 4. set selected to moved one
+        let index = NSIndexSet(index: to)
+        theTable.selectRowIndexes(index, byExtendingSelection: false)
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -204,8 +214,6 @@ class ViewController: NSViewController, NSWindowDelegate {
         let row = theTable.selectedRow
         let item = haystack[row]
         _moveItem(item, from: row, to: row - 1)
-        let index = NSIndexSet(index: row - 1)
-        theTable.selectRowIndexes(index, byExtendingSelection: false)
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -213,8 +221,6 @@ class ViewController: NSViewController, NSWindowDelegate {
         let row = theTable.selectedRow
         let item = haystack[row]
         _moveItem(item, from: row, to: row + 1)
-        let index = NSIndexSet(index: row + 1)
-        theTable.selectRowIndexes(index, byExtendingSelection: false)
     }
 
     // -------------------------------------------------------------------------------------------------

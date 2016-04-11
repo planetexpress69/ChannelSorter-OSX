@@ -8,15 +8,7 @@
 
 import Cocoa
 import AEXML
-/*
- serviceType
- SDTV = 1,
-	Radio = 2,
-	Data = 12,
-	SDTV_MPEG4 = 22,
-	HDTV = 25,
-	Option = 211
- */
+
 
 class ViewController: NSViewController, NSWindowDelegate {
 
@@ -27,6 +19,8 @@ class ViewController: NSViewController, NSWindowDelegate {
             theTable?.setDelegate(self)
         }
     }
+    @IBOutlet weak var theUpButton: NSButton!
+    @IBOutlet weak var theDnButton: NSButton!
 
     var xmlDoc: AEXMLDocument = AEXMLDocument()
     var haystack: [AEXMLElement] = []
@@ -37,6 +31,8 @@ class ViewController: NSViewController, NSWindowDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         theTable.registerForDraggedTypes([MyRowType, NSFilenamesPboardType])
+        theUpButton.enabled = false;
+        theDnButton.enabled = false;
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -179,10 +175,33 @@ class ViewController: NSViewController, NSWindowDelegate {
     }
 
     // ---------------------------------------------------------------------------------------------
+    @IBAction func up(sender: AnyObject) {
+        let row = theTable.selectedRow
+        let item = haystack[row]
+        _moveItem(item, from: row, to: row - 1)
+        let index = NSIndexSet(index: row - 1)
+        theTable.selectRowIndexes(index, byExtendingSelection: false)
+
+
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    @IBAction func dn(sender: AnyObject) {
+        let row = theTable.selectedRow
+        let item = haystack[row]
+        _moveItem(item, from: row, to: row + 1)
+        let index = NSIndexSet(index: row + 1)
+        theTable.selectRowIndexes(index, byExtendingSelection: false)
+    }
+
+    
+
+    // ---------------------------------------------------------------------------------------------
     func windowShouldClose(sender: AnyObject) -> Bool {
         return false
     }
 
+    // ---------------------------------------------------------------------------------------------
     func _humanReadableServiceType(serviceNum: String) -> String {
         switch serviceNum {
         case "1":
@@ -202,11 +221,10 @@ class ViewController: NSViewController, NSWindowDelegate {
         }
     }
 
-    
 }
 
 // -------------------------------------------------------------------------------------------------
-// NSTAbleViewDatasource protocol methods
+// MARK: NSTableViewDatasource protocol methods
 // -------------------------------------------------------------------------------------------------
 extension ViewController : NSTableViewDataSource {
 
@@ -221,8 +239,7 @@ extension ViewController : NSTableViewDataSource {
         let rowData = pasteboard.dataForType(MyRowType)
 
         if(rowData != nil) {
-            var dataArray = NSKeyedUnarchiver.unarchiveObjectWithData(rowData!) as! Array<NSIndexSet>,
-            indexSet = dataArray[0]
+            var dataArray = NSKeyedUnarchiver.unarchiveObjectWithData(rowData!) as! Array<NSIndexSet>, indexSet = dataArray[0]
 
             let movingFromIndex = indexSet.firstIndex
             let item = haystack[movingFromIndex]
@@ -254,12 +271,12 @@ extension ViewController : NSTableViewDataSource {
 }
 
 // -------------------------------------------------------------------------------------------------
-// NSTAbleViewDelegate protocol methods
+// MARK: NSTableViewDelegate protocol methods
 // -------------------------------------------------------------------------------------------------
 extension ViewController : NSTableViewDelegate {
     func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
 
-        var text:String = ""
+        var text: String = ""
         var cellIdentifier: String = ""
 
         guard let item:AEXMLElement = haystack[row] else {
@@ -283,6 +300,26 @@ extension ViewController : NSTableViewDelegate {
         }
 
         return nil
+    }
+
+    func tableViewSelectionDidChange(notification: NSNotification) {
+        let row = theTable.selectedRow
+        if row == -1 {
+            theDnButton.enabled = false
+            theUpButton.enabled = false
+        }
+        else if row == 0 {
+            theDnButton.enabled = true
+            theUpButton.enabled = false
+        }
+        else if row == (haystack.count - 1) {
+            theDnButton.enabled = false
+            theUpButton.enabled = true
+        }
+        else {
+            theDnButton.enabled = true
+            theUpButton.enabled = true
+        }
     }
     
 }

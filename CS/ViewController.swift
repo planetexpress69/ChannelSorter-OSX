@@ -12,7 +12,6 @@ import AEXML
 
 class ViewController: NSViewController, NSWindowDelegate {
 
-    @IBOutlet weak var theButton: NSButton!
     @IBOutlet weak var theTable: NSTableView! {
         didSet {
             theTable?.setDataSource(self)
@@ -43,6 +42,40 @@ class ViewController: NSViewController, NSWindowDelegate {
     }
 
     // ---------------------------------------------------------------------------------------------
+    // MARK: Load & save XML
+    // ---------------------------------------------------------------------------------------------
+    func _load(url: NSURL) {
+        let priority = DISPATCH_QUEUE_PRIORITY_DEFAULT
+        dispatch_async(dispatch_get_global_queue(priority, 0)) {
+
+            self.haystack.removeAll()
+
+            guard let
+                data = NSData(contentsOfURL: url)
+                else { return }
+
+            do {
+                self.xmlDoc = try AEXMLDocument(xmlData: data)
+                // i know that my channels are on DTV (digital tv)
+                for item in self.xmlDoc.root["CHANNEL"]["DTV"].children {
+                    //if item["serviceType"].stringValue != "2" {
+                    self.haystack.append(item)
+                    item.removeFromParent()
+                    //}
+                }
+                dispatch_async(dispatch_get_main_queue()) {
+                    print("Length: \(self.haystack.count)")
+                    self.theTable.reloadData()
+                }
+            }
+            catch {
+                print("\(error)")
+            }
+            
+        }
+    }
+
+    // ---------------------------------------------------------------------------------------------
     func _saveXml(url: NSURL) {
         let priority = DISPATCH_QUEUE_PRIORITY_DEFAULT
         dispatch_async(dispatch_get_global_queue(priority, 0)) {
@@ -65,44 +98,14 @@ class ViewController: NSViewController, NSWindowDelegate {
     }
 
     // ---------------------------------------------------------------------------------------------
-    func _load(url: NSURL) {
-        let priority = DISPATCH_QUEUE_PRIORITY_DEFAULT
-        dispatch_async(dispatch_get_global_queue(priority, 0)) {
-
-            self.haystack.removeAll()
-
-            guard let
-                data = NSData(contentsOfURL: url)
-                else { return }
-
-            do {
-                self.xmlDoc = try AEXMLDocument(xmlData: data)
-                // i know that my channels are on DTV (digital tv)
-                for item in self.xmlDoc.root["CHANNEL"]["DTV"].children {
-                    //if item["serviceType"].stringValue != "2" {
-                        self.haystack.append(item)
-                        item.removeFromParent()
-                    //}
-                }
-                dispatch_async(dispatch_get_main_queue()) {
-                    print("Length: \(self.haystack.count)")
-                    self.theTable.reloadData()
-                }
-            }
-            catch {
-                print("\(error)")
-            }
-
-        }
-    }
+    //override var representedObject: AnyObject? {
+    //    didSet {
+    //        // Update the view, if already loaded.
+    //    }
+    //}
 
     // ---------------------------------------------------------------------------------------------
-    override var representedObject: AnyObject? {
-        didSet {
-            // Update the view, if already loaded.
-        }
-    }
-
+    // MARK: - Helpers
     // ---------------------------------------------------------------------------------------------
     func _hexStringtoAscii(hexString : String) -> String {
         let pattern = "(0x)?([0-9a-f]{2})"
@@ -120,6 +123,28 @@ class ViewController: NSViewController, NSWindowDelegate {
     }
 
     // ---------------------------------------------------------------------------------------------
+    func _humanReadableServiceType(serviceNum: String) -> String {
+        switch serviceNum {
+        case "1":
+            return "SDTV"
+        case "2":
+            return "Radio"
+        case "12":
+            return "Data"
+        case "22":
+            return "SDTV MPEG4"
+        case "25":
+            return "HDTV"
+        case "211":
+            return "Option"
+        default:
+            return "unknown"
+        }
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // MARK: - Model move
+    // ---------------------------------------------------------------------------------------------
     func _moveItem(item: AEXMLElement, from: Int, to: Int) {
         haystack.removeAtIndex(from)
         if to > haystack.endIndex {
@@ -128,11 +153,24 @@ class ViewController: NSViewController, NSWindowDelegate {
         else {
             haystack.insert(item, atIndex: to)
         }
-
-        newOrder(nil)
+        newOrder() // re-neumbering
         theTable.reloadData()
     }
 
+    // ---------------------------------------------------------------------------------------------
+    func newOrder() {
+        for (index, _) in haystack.enumerate() {
+            let elem = haystack[index]
+            elem["prNum"].removeFromParent()
+            elem["isUserSelCHNo"].removeFromParent()
+            elem.addChild(AEXMLElement("prNum", value: "\(index + 1)"))
+            elem.addChild(AEXMLElement("isUserSelCHNo", value: "1"))
+            theTable.reloadData()
+        }
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    // MARK: - User triggered actions
     // ---------------------------------------------------------------------------------------------
     @IBAction func openXmlFile(sender: AnyObject) {
         let openPanel = NSOpenPanel()
@@ -159,20 +197,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         }
     }
 
-    // ---------------------------------------------------------------------------------------------
-    @IBAction func newOrder(sender: AnyObject?) {
-        for (index, _) in haystack.enumerate() {
-            // get elem
-            let elem = haystack[index]
-            // remove old attrs
-            elem["prNum"].removeFromParent()
-            elem["isUserSelCHNo"].removeFromParent()
-            // make new attrs
-            elem.addChild(AEXMLElement("prNum", value: "\(index + 1)"))
-            elem.addChild(AEXMLElement("isUserSelCHNo", value: "1"))
-            theTable.reloadData()
-        }
-    }
+
 
     // ---------------------------------------------------------------------------------------------
     @IBAction func up(sender: AnyObject) {
@@ -181,8 +206,6 @@ class ViewController: NSViewController, NSWindowDelegate {
         _moveItem(item, from: row, to: row - 1)
         let index = NSIndexSet(index: row - 1)
         theTable.selectRowIndexes(index, byExtendingSelection: false)
-
-
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -194,37 +217,18 @@ class ViewController: NSViewController, NSWindowDelegate {
         theTable.selectRowIndexes(index, byExtendingSelection: false)
     }
 
-    
-
-    // ---------------------------------------------------------------------------------------------
+    // -------------------------------------------------------------------------------------------------
+    // MARK: - NSWindowDelegate protocol methods
+    // -------------------------------------------------------------------------------------------------
     func windowShouldClose(sender: AnyObject) -> Bool {
         return false
     }
 
-    // ---------------------------------------------------------------------------------------------
-    func _humanReadableServiceType(serviceNum: String) -> String {
-        switch serviceNum {
-        case "1":
-            return "SDTV"
-        case "2":
-            return "Radio"
-        case "12":
-            return "Data"
-        case "22":
-            return "SDTV MPEG4"
-        case "25":
-            return "HDTV"
-        case "211":
-            return "Option"
-        default:
-            return "unknown"
-        }
-    }
 
 }
 
 // -------------------------------------------------------------------------------------------------
-// MARK: NSTableViewDatasource protocol methods
+// MARK: - NSTableViewDatasource protocol methods
 // -------------------------------------------------------------------------------------------------
 extension ViewController : NSTableViewDataSource {
 
@@ -271,7 +275,7 @@ extension ViewController : NSTableViewDataSource {
 }
 
 // -------------------------------------------------------------------------------------------------
-// MARK: NSTableViewDelegate protocol methods
+// MARK: - NSTableViewDelegate protocol methods
 // -------------------------------------------------------------------------------------------------
 extension ViewController : NSTableViewDelegate {
     func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {

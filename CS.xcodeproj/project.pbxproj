@@ -36,7 +36,7 @@
 /* Begin PBXFileReference section */
 		31182A88CF7ED0DEE269C1A1 /* Pods-CS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CS.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CS/Pods-CS.debug.xcconfig"; sourceTree = "<group>"; };
 		5B0BFC271CB802D500E65A96 /* GlobalClone00001.TLL */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = GlobalClone00001.TLL; sourceTree = "<group>"; };
-		5B0C4D181CB7ADF100A858DD /* CS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5B0C4D181CB7ADF100A858DD /* ChannelSorter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChannelSorter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B0C4D1B1CB7ADF100A858DD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5B0C4D1D1CB7ADF100A858DD /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		5B0C4D1F1CB7ADF100A858DD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -94,7 +94,7 @@
 		5B0C4D191CB7ADF100A858DD /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				5B0C4D181CB7ADF100A858DD /* CS.app */,
+				5B0C4D181CB7ADF100A858DD /* ChannelSorter.app */,
 				5B0C4D291CB7ADF100A858DD /* CSTests.xctest */,
 				5B0C4D341CB7ADF100A858DD /* CSUITests.xctest */,
 			);
@@ -151,9 +151,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		5B0C4D171CB7ADF100A858DD /* CS */ = {
+		5B0C4D171CB7ADF100A858DD /* ChannelSorter */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 5B0C4D3D1CB7ADF100A858DD /* Build configuration list for PBXNativeTarget "CS" */;
+			buildConfigurationList = 5B0C4D3D1CB7ADF100A858DD /* Build configuration list for PBXNativeTarget "ChannelSorter" */;
 			buildPhases = (
 				FE6B93FB1E7D126146A99F76 /* 📦 Check Pods Manifest.lock */,
 				5B0C4D141CB7ADF100A858DD /* Sources */,
@@ -166,9 +166,9 @@
 			);
 			dependencies = (
 			);
-			name = CS;
+			name = ChannelSorter;
 			productName = CS;
-			productReference = 5B0C4D181CB7ADF100A858DD /* CS.app */;
+			productReference = 5B0C4D181CB7ADF100A858DD /* ChannelSorter.app */;
 			productType = "com.apple.product-type.application";
 		};
 		5B0C4D281CB7ADF100A858DD /* CSTests */ = {
@@ -243,7 +243,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				5B0C4D171CB7ADF100A858DD /* CS */,
+				5B0C4D171CB7ADF100A858DD /* ChannelSorter */,
 				5B0C4D281CB7ADF100A858DD /* CSTests */,
 				5B0C4D331CB7ADF100A858DD /* CSUITests */,
 			);
@@ -355,12 +355,12 @@
 /* Begin PBXTargetDependency section */
 		5B0C4D2B1CB7ADF100A858DD /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 5B0C4D171CB7ADF100A858DD /* CS */;
+			target = 5B0C4D171CB7ADF100A858DD /* ChannelSorter */;
 			targetProxy = 5B0C4D2A1CB7ADF100A858DD /* PBXContainerItemProxy */;
 		};
 		5B0C4D361CB7ADF100A858DD /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 5B0C4D171CB7ADF100A858DD /* CS */;
+			target = 5B0C4D171CB7ADF100A858DD /* ChannelSorter */;
 			targetProxy = 5B0C4D351CB7ADF100A858DD /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -547,7 +547,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		5B0C4D3D1CB7ADF100A858DD /* Build configuration list for PBXNativeTarget "CS" */ = {
+		5B0C4D3D1CB7ADF100A858DD /* Build configuration list for PBXNativeTarget "ChannelSorter" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5B0C4D3E1CB7ADF100A858DD /* Debug */,

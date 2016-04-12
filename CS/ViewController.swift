@@ -23,6 +23,7 @@ class ViewController: NSViewController, NSWindowDelegate {
 
     var xmlDoc: AEXMLDocument = AEXMLDocument()
     var haystack: [AEXMLElement] = []
+    var theCurrentUrl: NSURL = NSURL()
 
     let MyRowType = "MyRowType"
 
@@ -58,14 +59,16 @@ class ViewController: NSViewController, NSWindowDelegate {
                 self.xmlDoc = try AEXMLDocument(xmlData: data)
                 // i know that my channels are on DTV (digital tv)
                 for item in self.xmlDoc.root["CHANNEL"]["DTV"].children {
-                    //if item["serviceType"].stringValue != "2" {
-                    self.haystack.append(item)
-                    item.removeFromParent()
-                    //}
+                    if item["serviceType"].stringValue != "2" { // no interested in Radio
+                        self.haystack.append(item)
+                        item.removeFromParent()
+                    }
                 }
+
                 dispatch_async(dispatch_get_main_queue()) {
                     print("Length: \(self.haystack.count)")
                     self.theTable.reloadData()
+                    self.theCurrentUrl = url
                 }
             }
             catch {
@@ -85,9 +88,13 @@ class ViewController: NSViewController, NSWindowDelegate {
             }
 
             do {
-                try self.xmlDoc.xmlString.writeToURL(url as NSURL,
-                                                     atomically: true,
-                                                     encoding: NSUTF8StringEncoding)
+                // LG TV is somewhat picky when it comes to XML
+                // no indentation, line endings with CRLF
+                let sXML = self.xmlDoc.xmlString
+                .stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+                .stringByReplacingOccurrencesOfString("\n", withString: "\r\n")
+                .stringByReplacingOccurrencesOfString("\t", withString: "")
+                try sXML.writeToURL(url as NSURL, atomically: true, encoding: NSUTF8StringEncoding)
             } catch {
                 // add some error handling here
             }
@@ -166,7 +173,7 @@ class ViewController: NSViewController, NSWindowDelegate {
         let index = NSIndexSet(index: to)
         theTable.selectRowIndexes(index, byExtendingSelection: false)
 
-        // prevent from scrolling out of view
+        // 5. prevent from scrolling out of view
         theTable.scrollRowToVisible(to)
     }
 
@@ -192,8 +199,12 @@ class ViewController: NSViewController, NSWindowDelegate {
         openPanel.canCreateDirectories = false
         openPanel.canChooseFiles = true
         openPanel.allowedFileTypes = ["TLL"]
+
+
+
         openPanel.beginWithCompletionHandler { (result) -> Void in
             if result == NSFileHandlingPanelOKButton {
+
                 self._load(openPanel.URL!)
             }
         }
@@ -202,6 +213,11 @@ class ViewController: NSViewController, NSWindowDelegate {
     // ---------------------------------------------------------------------------------------------
     @IBAction func saveXmlFile(sender: AnyObject) {
         let savePanel = NSSavePanel()
+        savePanel.nameFieldStringValue = "GlobalClone00001"
+        savePanel.allowedFileTypes = ["TLL"]
+        savePanel.showsHiddenFiles = true
+        savePanel.canCreateDirectories = true
+        savePanel.canSelectHiddenExtension = true
         savePanel.beginWithCompletionHandler { (result) in
             if result == NSFileHandlingPanelOKButton {
                 let exportedFileURL = savePanel.URL

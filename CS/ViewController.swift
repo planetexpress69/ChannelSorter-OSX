@@ -21,18 +21,28 @@ class ViewController: NSViewController, NSWindowDelegate {
     @IBOutlet weak var theUpButton: NSButton!
     @IBOutlet weak var theDnButton: NSButton!
 
-    var xmlDoc: AEXMLDocument = AEXMLDocument()
-    var haystack: [AEXMLElement] = []
+    //var xmlDoc: AEXMLDocument = AEXMLDocument()
+    //var haystack: [AEXMLElement] = []
     var theCurrentUrl: NSURL = NSURL()
 
     let MyRowType = "MyRowType"
+
+
 
     // ---------------------------------------------------------------------------------------------
     override func viewDidLoad() {
         super.viewDidLoad()
         theTable.registerForDraggedTypes([MyRowType, NSFilenamesPboardType])
-        theUpButton.enabled = false;
-        theDnButton.enabled = false;
+        theUpButton.enabled = false
+        theDnButton.enabled = false
+        NSNotificationCenter
+            .defaultCenter()
+            .addObserver(self, selector: #selector(self.didGetTLL), name: "DidGetData", object:nil)
+    }
+
+    // ---------------------------------------------------------------------------------------------
+    func didGetTLL(notification: NSNotification) {
+        theTable.reloadData()
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -42,67 +52,6 @@ class ViewController: NSViewController, NSWindowDelegate {
         self.view.window?.title = "ChannelSorter"
     }
 
-    // ---------------------------------------------------------------------------------------------
-    // MARK: Load & save XML
-    // ---------------------------------------------------------------------------------------------
-    func _load(url: NSURL) {
-        let priority = DISPATCH_QUEUE_PRIORITY_DEFAULT
-        dispatch_async(dispatch_get_global_queue(priority, 0)) {
-
-            self.haystack.removeAll()
-
-            guard let
-                data = NSData(contentsOfURL: url)
-                else { return }
-
-            do {
-                self.xmlDoc = try AEXMLDocument(xmlData: data)
-                // i know that my channels are on DTV (digital tv)
-                for item in self.xmlDoc.root["CHANNEL"]["DTV"].children {
-                    if item["serviceType"].stringValue != "2" { // no interested in Radio
-                        self.haystack.append(item)
-                        item.removeFromParent()
-                    }
-                }
-
-                dispatch_async(dispatch_get_main_queue()) {
-                    print("Length: \(self.haystack.count)")
-                    self.theTable.reloadData()
-                    self.theCurrentUrl = url
-                }
-            }
-            catch {
-                print("\(error)")
-            }
-            
-        }
-    }
-
-    // ---------------------------------------------------------------------------------------------
-    func _saveXml(url: NSURL) {
-        let priority = DISPATCH_QUEUE_PRIORITY_DEFAULT
-        dispatch_async(dispatch_get_global_queue(priority, 0)) {
-
-            for (index, _) in self.haystack.enumerate() {
-                self.xmlDoc.root["CHANNEL"]["DTV"].addChild(self.haystack[index])
-            }
-
-            do {
-                // LG TV is somewhat picky when it comes to XML
-                // no indentation, line endings with CRLF
-                let sXML = self.xmlDoc.xmlString
-                .stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
-                .stringByReplacingOccurrencesOfString("\n", withString: "\r\n")
-                .stringByReplacingOccurrencesOfString("\t", withString: "")
-                try sXML.writeToURL(url as NSURL, atomically: true, encoding: NSUTF8StringEncoding)
-            } catch {
-                // add some error handling here
-            }
-            dispatch_async(dispatch_get_main_queue()) {
-
-            }
-        }
-    }
 
     // ---------------------------------------------------------------------------------------------
     //override var representedObject: AnyObject? {
@@ -133,15 +82,15 @@ class ViewController: NSViewController, NSWindowDelegate {
     func _humanReadableServiceType(serviceNum: String) -> String {
         switch serviceNum {
         case "1":
-            return "SDTV"
+            return "SD-TV"
         case "2":
             return "Radio"
         case "12":
             return "Data"
         case "22":
-            return "SDTV MPEG4"
+            return "SD-TV MPEG4"
         case "25":
-            return "HDTV"
+            return "HD-TV"
         case "211":
             return "Option"
         default:
@@ -155,12 +104,12 @@ class ViewController: NSViewController, NSWindowDelegate {
     func _moveItem(item: AEXMLElement, from: Int, to: Int) {
 
         // 1. remove & re-insert or append
-        haystack.removeAtIndex(from)
-        if to > haystack.endIndex {
-            haystack.append(item)
+        SimpleDAO.sharedInstance.haystack.removeAtIndex(from)
+        if to > SimpleDAO.sharedInstance.haystack.endIndex {
+            SimpleDAO.sharedInstance.haystack.append(item)
         }
         else {
-            haystack.insert(item, atIndex: to)
+            SimpleDAO.sharedInstance.haystack.insert(item, atIndex: to)
         }
 
         // 2. re-neumbering
@@ -179,8 +128,8 @@ class ViewController: NSViewController, NSWindowDelegate {
 
     // ---------------------------------------------------------------------------------------------
     func newOrder() {
-        for (index, _) in haystack.enumerate() {
-            let elem = haystack[index]
+        for (index, _) in SimpleDAO.sharedInstance.haystack.enumerate() {
+            let elem = SimpleDAO.sharedInstance.haystack[index]
             elem["prNum"].removeFromParent()
             elem["isUserSelCHNo"].removeFromParent()
             elem.addChild(AEXMLElement("prNum", value: "\(index + 1)"))
@@ -192,59 +141,26 @@ class ViewController: NSViewController, NSWindowDelegate {
     // ---------------------------------------------------------------------------------------------
     // MARK: - User triggered actions
     // ---------------------------------------------------------------------------------------------
-    @IBAction func openXmlFile(sender: AnyObject) {
-        let openPanel = NSOpenPanel()
-        openPanel.allowsMultipleSelection = false
-        openPanel.canChooseDirectories = false
-        openPanel.canCreateDirectories = false
-        openPanel.canChooseFiles = true
-        openPanel.allowedFileTypes = ["TLL"]
-
-
-
-        openPanel.beginWithCompletionHandler { (result) -> Void in
-            if result == NSFileHandlingPanelOKButton {
-
-                self._load(openPanel.URL!)
-            }
-        }
-    }
-
-    // ---------------------------------------------------------------------------------------------
-    @IBAction func saveXmlFile(sender: AnyObject) {
-        let savePanel = NSSavePanel()
-        savePanel.nameFieldStringValue = "GlobalClone00001"
-        savePanel.allowedFileTypes = ["TLL"]
-        savePanel.showsHiddenFiles = true
-        savePanel.canCreateDirectories = true
-        savePanel.canSelectHiddenExtension = true
-        savePanel.beginWithCompletionHandler { (result) in
-            if result == NSFileHandlingPanelOKButton {
-                let exportedFileURL = savePanel.URL
-                self._saveXml(exportedFileURL!)
-            }
-        }
-    }
-
+    
 
 
     // ---------------------------------------------------------------------------------------------
     @IBAction func up(sender: AnyObject) {
         let row = theTable.selectedRow
-        let item = haystack[row]
+        let item = SimpleDAO.sharedInstance.haystack[row]
         _moveItem(item, from: row, to: row - 1)
     }
 
     // ---------------------------------------------------------------------------------------------
     @IBAction func dn(sender: AnyObject) {
         let row = theTable.selectedRow
-        let item = haystack[row]
+        let item = SimpleDAO.sharedInstance.haystack[row]
         _moveItem(item, from: row, to: row + 1)
     }
 
-    // -------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------
     // MARK: - NSWindowDelegate protocol methods
-    // -------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------
     func windowShouldClose(sender: AnyObject) -> Bool {
         return false
     }
@@ -259,7 +175,7 @@ extension ViewController : NSTableViewDataSource {
 
     // ---------------------------------------------------------------------------------------------
     func numberOfRowsInTableView(tableView: NSTableView) -> Int {
-        return haystack.count ?? 0
+        return SimpleDAO.sharedInstance.haystack.count ?? 0
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -268,14 +184,11 @@ extension ViewController : NSTableViewDataSource {
         let rowData = pasteboard.dataForType(MyRowType)
 
         if(rowData != nil) {
-            var dataArray = NSKeyedUnarchiver.unarchiveObjectWithData(rowData!) as! Array<NSIndexSet>, indexSet = dataArray[0]
-
+            var dataArray = NSKeyedUnarchiver.unarchiveObjectWithData(rowData!) as! Array<NSIndexSet>
+            let indexSet = dataArray[0]
             let movingFromIndex = indexSet.firstIndex
-            let item = haystack[movingFromIndex]
-
+            let item = SimpleDAO.sharedInstance.haystack[movingFromIndex]
             _moveItem(item, from: movingFromIndex, to: row)
-
-
             return true
         }
         else {
@@ -303,12 +216,13 @@ extension ViewController : NSTableViewDataSource {
 // MARK: - NSTableViewDelegate protocol methods
 // -------------------------------------------------------------------------------------------------
 extension ViewController : NSTableViewDelegate {
-    func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
+    func tableView(tableView: NSTableView,
+                   viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
 
         var text: String = ""
         var cellIdentifier: String = ""
 
-        guard let item:AEXMLElement = haystack[row] else {
+        guard let item:AEXMLElement = SimpleDAO.sharedInstance.haystack[row] else {
             return nil
         }
 
@@ -342,7 +256,7 @@ extension ViewController : NSTableViewDelegate {
             theDnButton.enabled = true
             theUpButton.enabled = false
         }
-        else if row == (haystack.count - 1) {
+        else if row == (SimpleDAO.sharedInstance.haystack.count - 1) {
             theDnButton.enabled = false
             theUpButton.enabled = true
         }

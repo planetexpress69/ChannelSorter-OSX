@@ -13,6 +13,9 @@
 		5B0C4D231CB7ADF100A858DD /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5B0C4D211CB7ADF100A858DD /* Main.storyboard */; };
 		5B0C4D2E1CB7ADF100A858DD /* CSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0C4D2D1CB7ADF100A858DD /* CSTests.swift */; };
 		5B0C4D391CB7ADF100A858DD /* CSUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B0C4D381CB7ADF100A858DD /* CSUITests.swift */; };
+		5B19B7421CC2C67200F34355 /* SimpleDAO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B19B7411CC2C67200F34355 /* SimpleDAO.swift */; };
+		5B305D7E1CC17E7500D2994C /* WindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B305D7D1CC17E7500D2994C /* WindowController.swift */; };
+		5B305D801CC17EAE00D2994C /* TabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B305D7F1CC17EAE00D2994C /* TabViewController.swift */; };
 		A0E8CCEFA59B673F4DFE8EAB /* Pods_CS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8A84944E411159F0009FC01C /* Pods_CS.framework */; };
 /* End PBXBuildFile section */
 
@@ -48,6 +51,9 @@
 		5B0C4D341CB7ADF100A858DD /* CSUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CSUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B0C4D381CB7ADF100A858DD /* CSUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSUITests.swift; sourceTree = "<group>"; };
 		5B0C4D3A1CB7ADF100A858DD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5B19B7411CC2C67200F34355 /* SimpleDAO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleDAO.swift; sourceTree = "<group>"; };
+		5B305D7D1CC17E7500D2994C /* WindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WindowController.swift; sourceTree = "<group>"; };
+		5B305D7F1CC17EAE00D2994C /* TabViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabViewController.swift; sourceTree = "<group>"; };
 		8A84944E411159F0009FC01C /* Pods_CS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C9B6466967FF4EE181A3C7DA /* Pods-CS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CS.release.xcconfig"; path = "Pods/Target Support Files/Pods-CS/Pods-CS.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -105,7 +111,10 @@
 			isa = PBXGroup;
 			children = (
 				5B0C4D1B1CB7ADF100A858DD /* AppDelegate.swift */,
+				5B305D7F1CC17EAE00D2994C /* TabViewController.swift */,
+				5B305D7D1CC17E7500D2994C /* WindowController.swift */,
 				5B0C4D1D1CB7ADF100A858DD /* ViewController.swift */,
+				5B19B7411CC2C67200F34355 /* SimpleDAO.swift */,
 				5B0C4D1F1CB7ADF100A858DD /* Assets.xcassets */,
 				5B0C4D211CB7ADF100A858DD /* Main.storyboard */,
 				5B0C4D241CB7ADF100A858DD /* Info.plist */,
@@ -329,7 +338,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5B305D801CC17EAE00D2994C /* TabViewController.swift in Sources */,
 				5B0C4D1E1CB7ADF100A858DD /* ViewController.swift in Sources */,
+				5B19B7421CC2C67200F34355 /* SimpleDAO.swift in Sources */,
+				5B305D7E1CC17E7500D2994C /* WindowController.swift in Sources */,
 				5B0C4D1C1CB7ADF100A858DD /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

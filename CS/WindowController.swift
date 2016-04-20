@@ -74,10 +74,10 @@ class WindowController: NSWindowController {
 
                 // i know that my channels are on DTV (digital tv)
                 for item in xmlDoc.root["CHANNEL"]["DTV"].children {
-                    if item["serviceType"].stringValue != "2" { // no interested in Radio
+                    //if item["serviceType"].stringValue != "2" { // no interested in Radio
                         haystack.append(item)
                         item.removeFromParent()
-                    }
+                    //}
                 }
 
                 dispatch_async(dispatch_get_main_queue()) {

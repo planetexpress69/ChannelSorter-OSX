@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="10117" systemVersion="15E65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -501,9 +501,9 @@
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" preferredMaxLayoutWidth="226" translatesAutoresizingMaskIntoConstraints="NO" id="IUM-CV-njt">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="100" height="17"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="282" height="17"/>
                                                                     <constraints>
-                                                                        <constraint firstAttribute="width" constant="96" id="Oah-ts-yi9"/>
+                                                                        <constraint firstAttribute="width" constant="278" id="Oah-ts-yi9"/>
                                                                     </constraints>
                                                                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Table View Cell" id="6Af-wL-jTd">
                                                                         <font key="font" metaFont="system"/>
@@ -513,6 +513,7 @@
                                                                 </textField>
                                                             </subviews>
                                                             <constraints>
+                                                                <constraint firstAttribute="trailing" secondItem="IUM-CV-njt" secondAttribute="trailing" constant="20" id="0Qd-gj-VRX"/>
                                                                 <constraint firstItem="IUM-CV-njt" firstAttribute="centerY" secondItem="jsb-kA-Yn0" secondAttribute="centerY" id="9Le-V3-cdB"/>
                                                                 <constraint firstItem="IUM-CV-njt" firstAttribute="leading" secondItem="jsb-kA-Yn0" secondAttribute="leading" constant="2" id="sZd-v0-gy3"/>
                                                             </constraints>
@@ -607,14 +608,14 @@
                             </button>
                         </subviews>
                         <constraints>
-                            <constraint firstAttribute="bottom" secondItem="oAr-aG-fcA" secondAttribute="bottom" id="5W1-Ex-0gy"/>
                             <constraint firstItem="Qyv-qN-6J8" firstAttribute="leading" secondItem="eM8-RY-BNm" secondAttribute="leading" constant="20" symbolic="YES" id="AZd-mF-KlL"/>
+                            <constraint firstItem="oAr-aG-fcA" firstAttribute="top" secondItem="K08-pb-sOk" secondAttribute="bottom" constant="22" id="E8V-af-5sa"/>
                             <constraint firstItem="Qyv-qN-6J8" firstAttribute="baseline" secondItem="K08-pb-sOk" secondAttribute="baseline" id="Q3t-wk-H01"/>
-                            <constraint firstItem="oAr-aG-fcA" firstAttribute="top" secondItem="eM8-RY-BNm" secondAttribute="top" constant="64" id="R9y-ec-EHu"/>
+                            <constraint firstItem="oAr-aG-fcA" firstAttribute="top" secondItem="eM8-RY-BNm" secondAttribute="top" constant="64" id="Tbn-aX-eXI"/>
+                            <constraint firstAttribute="bottom" secondItem="oAr-aG-fcA" secondAttribute="bottom" id="ZJZ-AC-leP"/>
+                            <constraint firstAttribute="trailing" secondItem="oAr-aG-fcA" secondAttribute="trailing" id="bBA-0O-Agr"/>
                             <constraint firstItem="K08-pb-sOk" firstAttribute="leading" secondItem="Qyv-qN-6J8" secondAttribute="trailing" constant="8" id="ijx-eE-DAI"/>
-                            <constraint firstItem="oAr-aG-fcA" firstAttribute="leading" secondItem="eM8-RY-BNm" secondAttribute="leading" id="nfY-Ar-DMS"/>
-                            <constraint firstAttribute="trailing" secondItem="oAr-aG-fcA" secondAttribute="trailing" id="qWJ-ER-VKB"/>
-                            <constraint firstItem="oAr-aG-fcA" firstAttribute="top" secondItem="K08-pb-sOk" secondAttribute="bottom" constant="22" id="ylZ-Bc-vvs"/>
+                            <constraint firstItem="oAr-aG-fcA" firstAttribute="leading" secondItem="eM8-RY-BNm" secondAttribute="leading" id="rfy-uU-XMb"/>
                         </constraints>
                     </view>
                     <connections>
